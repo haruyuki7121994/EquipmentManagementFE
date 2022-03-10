@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import {
   CButton,
@@ -10,6 +9,7 @@ import {
   CCol,
   CContainer,
   CForm,
+  CFormFeedback,
   CFormInput,
   CInputGroup,
   CInputGroupText,
@@ -20,14 +20,32 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { loginReducer } from '../../../redux/reducers/loginReducer'
 import axios from 'axios'
 import { API, HOST, STATUS_CODE } from '../../../api'
+import { AppAlert } from '../../../components/AppAlert'
+import { alertReducer } from '../../../redux/reducers/alertReducer'
+import AlertService from '../../../services/AlertService'
 
 const Login = () => {
+  const [invalidUsername, setInvalidUsername] = useState({ invalid: false, msg: '' })
+  const [invalidPassword, setInvalidPassword] = useState({ invalid: false, msg: '' })
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
   const navigate = useHistory()
 
   const handleClick = () => {
+    let validated = true
+    if (username.length === 0) {
+      setInvalidUsername({ invalid: true, msg: 'Username required!' })
+      validated = false
+    } else setInvalidUsername({ invalid: false, msg: '' })
+
+    if (password.length === 0) {
+      setInvalidPassword({ invalid: true, msg: 'Password required!' })
+      validated = false
+    } else setInvalidPassword({ invalid: false, msg: '' })
+
+    if (!validated) return
+
     axios
       .post(HOST + API.LOGIN, {
         username: username,
@@ -44,6 +62,12 @@ const Login = () => {
             }),
           )
           navigate.push('/dashboard')
+        }
+      })
+      .catch((res) => {
+        if (res.response.status === STATUS_CODE.UNAUTHORIZED) {
+          dispatch(alertReducer.actions.set(AlertService.getPayload('Login failed!')))
+          console.log('fail')
         }
       })
   }
@@ -64,22 +88,28 @@ const Login = () => {
                   <CForm>
                     <h1>Login</h1>
                     <p className="text-medium-emphasis">Sign In to your account</p>
+                    <AppAlert />
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
+                        invalid={invalidUsername.invalid}
                         placeholder="Username"
                         autoComplete="username"
                         value={username}
                         onChange={handleChangeUsername}
                       />
                     </CInputGroup>
+                    <CFormFeedback invalid>
+                      <strong>{invalidUsername.msg}</strong>
+                    </CFormFeedback>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
+                        invalid={invalidPassword.invalid}
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
@@ -87,6 +117,9 @@ const Login = () => {
                         onChange={handleChangePassword}
                       />
                     </CInputGroup>
+                    <CFormFeedback invalid>
+                      <strong>{invalidPassword.msg}</strong>
+                    </CFormFeedback>
                     <CRow>
                       <CCol xs={6}>
                         <CButton color="primary" className="px-4" onClick={handleClick}>

@@ -28,6 +28,7 @@ const API = {
     LIST: '/maintenances/all',
     CREATE: '/maintenances/create',
     ADD_EQUIPMENTS: '/maintenances/:id/add-equipments',
+    REMOVE_EQUIPMENTS: '/maintenances/:id/remove-equipments',
     FIND: '/maintenances/:id',
     UPDATE: '/maintenances/:id',
     DELETE: '/maintenances/:id',
@@ -40,6 +41,7 @@ const STATUS_CODE = {
   ERROR: 500,
   BAD_REQUEST: 400,
   CONFLICT: 409,
+  UNAUTHORIZED: 401,
 }
 
 export { API, STATUS_CODE, HOST }

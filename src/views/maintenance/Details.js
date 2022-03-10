@@ -15,23 +15,28 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import QRCode from 'qrcode.react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import { currentMaintenance } from '../../redux/selectors'
 import MaintenanceService from '../../services/MaintenanceService'
 import { STATUS_CODE } from '../../api'
 import { maintenanceReducer } from '../../redux/reducers/maintenanceReducer'
 import CookieService from '../../services/CookieService'
+import CIcon from '@coreui/icons-react'
+import { cilTrash } from '@coreui/icons'
+import { alertReducer } from '../../redux/reducers/alertReducer'
+import AlertService from '../../services/AlertService'
 
 const Detail = () => {
   const dispatch = useDispatch()
   const maintenance = useSelector(currentMaintenance)
+  let [listQrcode, setListQrcode] = useState([])
+  const [change, setChange] = useState(false)
   const typeOptions = MaintenanceService.typeOptions
   const sttMapping = MaintenanceService.sttMapping
   useEffect(() => {
-    if (Object.keys(maintenance).length === 0) {
+    if (Object.keys(maintenance).length === 0 || change) {
       const id = CookieService.get('maintenance_id')
       MaintenanceService.get(id).then((res) => {
         const data = res.data
@@ -41,10 +46,73 @@ const Detail = () => {
               data: data.data,
             }),
           )
+          setChange(false)
         }
       })
     }
-  }, [dispatch, maintenance])
+  }, [change, dispatch, maintenance])
+
+  const handleRemoveQrcode = (e) => {
+    const qrcode = e.currentTarget.id
+    const newListQrcode = listQrcode.filter((qr) => qr !== qrcode)
+    setListQrcode(newListQrcode)
+  }
+
+  const handleCheckBtn = (e) => {
+    const qrcode = e.currentTarget.id
+    if (listQrcode.includes(qrcode)) return
+    setListQrcode([...listQrcode, qrcode])
+  }
+
+  const qrcodeCheckedComponent = (listQrcode) => {
+    let qrcodeComponent = []
+    let subArray = []
+    for (let i = 0; i < listQrcode.length; i++) {
+      subArray.push(listQrcode[i])
+      if ((i + 1) % 6 === 0) {
+        qrcodeComponent.push(subArray)
+        subArray = []
+      }
+    }
+    if (subArray.length > 0) qrcodeComponent.push(subArray)
+    return (
+      <CTable>
+        {qrcodeComponent.map((item, index) => {
+          return (
+            <CTableRow key={index} className={'text-center'}>
+              {item.map((subItem, subIndex) => {
+                return (
+                  <CTableHeaderCell key={subIndex}>
+                    <QRCode
+                      id="qrcode"
+                      value={subItem}
+                      size={90}
+                      level={'H'}
+                      includeMargin={true}
+                    />
+                    <div>{subItem}</div>
+                    <div style={{ cursor: 'pointer' }} id={subItem} onClick={handleRemoveQrcode}>
+                      <CIcon icon={cilTrash} size={'xl'} />
+                    </div>
+                  </CTableHeaderCell>
+                )
+              })}
+            </CTableRow>
+          )
+        })}
+      </CTable>
+    )
+  }
+
+  const handleSubmit = (e) => {
+    const data = { equipmentListQrcode: listQrcode }
+    MaintenanceService.removeEquipments(data, maintenance.id).then((res) => {
+      if (res.data.status === STATUS_CODE.SUCCESS) {
+        setChange(true)
+        setListQrcode([])
+      }
+    })
+  }
   return (
     <CCol xs={12}>
       <CCard className="mb-4">
@@ -102,7 +170,7 @@ const Detail = () => {
                 <CTable align="middle" className="mb-0 border" hover responsive>
                   <CTableHead color="light">
                     <CTableRow>
-                      <CTableHeaderCell>QrCode</CTableHeaderCell>
+                      <CTableHeaderCell className={'text-center'}>QrCode</CTableHeaderCell>
                       <CTableHeaderCell>Name</CTableHeaderCell>
                       <CTableHeaderCell>Status</CTableHeaderCell>
                       <CTableHeaderCell>Location</CTableHeaderCell>
@@ -113,13 +181,16 @@ const Detail = () => {
                     {maintenance.equipments.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index}>
                         <CTableDataCell>
-                          <QRCode
-                            id="qrcode"
-                            value={item.qrcode}
-                            size={50}
-                            level={'H'}
-                            includeMargin={true}
-                          />
+                          <div className={'text-center'}>
+                            <QRCode
+                              id="qrcode"
+                              value={item.qrcode}
+                              size={64}
+                              level={'H'}
+                              includeMargin={true}
+                            />
+                            <p>{item.qrcode}</p>
+                          </div>
                         </CTableDataCell>
                         <CTableDataCell>
                           <CLink href="/">{item.name}</CLink>
@@ -135,7 +206,12 @@ const Detail = () => {
                             : item.location}
                         </CTableDataCell>
                         <CTableDataCell>
-                          <CButton color={'danger'} style={{ color: 'white' }}>
+                          <CButton
+                            id={item.qrcode}
+                            onClick={handleCheckBtn}
+                            color={'danger'}
+                            style={{ color: 'white' }}
+                          >
                             Remove
                           </CButton>
                         </CTableDataCell>
@@ -146,6 +222,15 @@ const Detail = () => {
               ) : null}
             </CCardBody>
           </CCard>
+          <CCard className={'mt-3'}>
+            <CCardHeader>List Equipment Checked</CCardHeader>
+            <CCardBody>
+              {listQrcode.length > 0 ? qrcodeCheckedComponent(listQrcode) : <p>No Equipment</p>}
+            </CCardBody>
+          </CCard>
+          <CCol xs={12} className={'mt-2'}>
+            <CButton onClick={handleSubmit}>Submit</CButton>
+          </CCol>
         </CCardBody>
       </CCard>
     </CCol>

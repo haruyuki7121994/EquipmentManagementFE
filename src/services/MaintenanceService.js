@@ -12,6 +12,9 @@ const create = (data) => {
 const addEquipments = (data, id) => {
   return http.post(API.MAINTENANCE.ADD_EQUIPMENTS.replace(':id', id), data)
 }
+const removeEquipments = (data, id) => {
+  return http.post(API.MAINTENANCE.REMOVE_EQUIPMENTS.replace(':id', id), data)
+}
 const remove = (id) => {
   return http.delete(API.MAINTENANCE.DELETE.replace(':id', id))
 }
@@ -35,6 +38,7 @@ const MaintenanceService = {
   edit,
   create,
   addEquipments,
+  removeEquipments,
   createNotification,
   typeOptions,
   sttMapping,
