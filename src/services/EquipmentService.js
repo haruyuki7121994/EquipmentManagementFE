@@ -24,6 +24,13 @@ const removeImage = (id) => {
 const checkListQrcode = (data) => {
   return http.post(API.EQUIPMENT.CHECK_QRCODE, data)
 }
+const getLogs = (data) => {
+  return http.get(API.EQUIPMENT.LOG, data)
+}
+const rollback = (id) => {
+  return http.post(API.EQUIPMENT.ROLLBACK.replace(':id', id))
+}
+const sttLogMapping = ['Processing', 'Completed', 'Rollback']
 const EquipmentService = {
   getAll,
   get,
@@ -33,5 +40,8 @@ const EquipmentService = {
   removeImage,
   bulkCreate,
   checkListQrcode,
+  getLogs,
+  rollback,
+  sttLogMapping,
 }
 export default EquipmentService

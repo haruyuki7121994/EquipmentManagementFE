@@ -33,6 +33,8 @@ const API = {
     DELETE: '/equipments/:id',
     DELETE_IMAGE: '/storage/:id',
     CHECK_QRCODE: '/equipments/qrcode/check',
+    LOG: '/logs/all',
+    ROLLBACK: '/logs/rollback/:id',
   },
   MAINTENANCE: {
     LIST: '/maintenances/all',

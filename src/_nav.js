@@ -99,13 +99,18 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Export Qrcode',
+        to: '/equipments/export',
+      },
+      {
+        component: CNavItem,
         name: 'Bulk Create',
         to: '/equipments/bulk-create',
       },
       {
         component: CNavItem,
-        name: 'Export Qrcode',
-        to: '/equipments/export',
+        name: 'Log',
+        to: '/equipments/logs',
       },
     ],
   },

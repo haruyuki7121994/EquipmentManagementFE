@@ -180,13 +180,10 @@ const BulkCreate = () => {
       validated = false
     } else setInvalidActive({ invalid: false, msg: '' })
 
-    if (quantity < 1) {
-      setInvalidQuantity({ invalid: true, msg: validator.quantity.min })
-      validated = false
-    } else setInvalidQuantity({ invalid: false, msg: '' })
-
-    if (quantity > 300) {
-      setInvalidQuantity({ invalid: true, msg: validator.quantity.max })
+    if (quantity === '' || quantity < 1 || quantity > 300) {
+      if (quantity === '') setInvalidQuantity({ invalid: true, msg: validator.quantity.min })
+      if (quantity < 1) setInvalidQuantity({ invalid: true, msg: validator.quantity.min })
+      if (quantity > 300) setInvalidQuantity({ invalid: true, msg: validator.quantity.max })
       validated = false
     } else setInvalidQuantity({ invalid: false, msg: '' })
 
@@ -245,7 +242,7 @@ const BulkCreate = () => {
             AlertService.getPayload('Bulk Create Successful! Wait for Processing!'),
           ),
         )
-        navigate.push('/equipments/list')
+        navigate.push('/equipments/logs')
       }
     })
   }

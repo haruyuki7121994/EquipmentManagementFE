@@ -74,6 +74,7 @@ const BulkCreateEquipments = React.lazy(() => import('./views/equipments/BulkCre
 const DetailEquipments = React.lazy(() => import('./views/equipments/Detail'))
 const ExportQrcode = React.lazy(() => import('./views/equipments/Export'))
 const A4Page = React.lazy(() => import('./views/equipments/A4Page'))
+const Logs = React.lazy(() => import('./views/equipments/Logs'))
 
 // Maintenance
 const ListMaintenance = React.lazy(() => import('./views/maintenance/List'))
@@ -105,6 +106,7 @@ const routes = [
   { path: '/equipments/edit', name: 'Edit', component: UpdateEquipments },
   { path: '/equipments/export', name: 'Export', component: ExportQrcode },
   { path: '/equipments/a4', name: 'Edit', component: A4Page },
+  { path: '/equipments/logs', name: 'Logs', component: Logs },
   { path: '/maintenance', name: 'Maintenance', component: Cards, exact: true },
   { path: '/maintenance/list', name: 'List', component: ListMaintenance },
   { path: '/maintenance/create', name: 'Create', component: CreateMaintenance },
