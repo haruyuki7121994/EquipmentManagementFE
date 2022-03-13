@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import changeStateReducer from './redux/reducers/changeStateReducer'
-import { loginReducer } from './redux/reducers/loginReducer'
+import { authReducer } from './redux/reducers/authReducer'
 import { categoryReducer } from './redux/reducers/categoryReducer'
 import { maintainerReducer } from './redux/reducers/maintainerReducer'
 import { equipmentReducer } from './redux/reducers/equipmentReducer'
@@ -11,7 +11,7 @@ const store = configureStore({
   reducer: {
     changeState: changeStateReducer,
     alert: alertReducer.reducer,
-    auth: loginReducer.reducer,
+    auth: authReducer.reducer,
     category: categoryReducer.reducer,
     maintainer: maintainerReducer.reducer,
     equipment: equipmentReducer.reducer,

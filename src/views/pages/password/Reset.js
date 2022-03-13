@@ -7,15 +7,47 @@ import {
   CCol,
   CContainer,
   CForm,
+  CFormFeedback,
   CFormInput,
   CInputGroup,
   CInputGroupText,
   CRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import { cilUser } from '@coreui/icons'
+import AuthService from '../../../services/AuthService'
+import CookieService from '../../../services/CookieService'
+import { useHistory } from 'react-router-dom'
 
 const Reset = () => {
+  const [email, setEmail] = useState('')
+  const [invalidEmail, setInvalidEmail] = useState({ invalid: false, msg: '' })
+  const history = useHistory()
+
+  const handleSubmit = (e) => {
+    let validated = true
+    if (email.length === 0) {
+      setInvalidEmail({ invalid: true, msg: 'Email is required!' })
+      validated = false
+    } else setInvalidEmail({ invalid: false, msg: '' })
+
+    if (!validated) return
+
+    const data = {
+      email: email,
+    }
+    AuthService.sendForgotPassword(data)
+      .then((res) => {
+        const data = res.data
+        console.log(data)
+        CookieService.save('email_forgot', email)
+        history.push('/verify')
+      })
+      .catch((res) => {
+        const data = res.response
+        console.log(data)
+      })
+  }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -31,17 +63,20 @@ const Reset = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
-                    </CInputGroup>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupText>
-                        <CIcon icon={cilUser} />
-                      </CInputGroupText>
-                      <CFormInput placeholder="Email" autoComplete="username" />
+                      <CFormInput
+                        invalid={invalidEmail.invalid}
+                        value={email}
+                        onChange={(e) => setEmail(e.currentTarget.value)}
+                        placeholder="Email"
+                        autoComplete="username"
+                      />
+                      <CFormFeedback invalid>
+                        <strong>{invalidEmail.msg}</strong>
+                      </CFormFeedback>
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
+                        <CButton onClick={handleSubmit} color="primary" className="px-4">
                           Send
                         </CButton>
                       </CCol>

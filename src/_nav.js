@@ -1,12 +1,14 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
+  cilAccountLogout,
+  cilAddressBook,
+  cilAlarm,
   cilBalanceScale,
-  cilClock,
+  cilContact,
   cilLayers,
   cilSpeedometer,
   cilUser,
-  cilUserX,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -17,8 +19,8 @@ const _nav = [
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     badge: {
-      color: 'info',
-      text: 'NEW',
+      color: 'danger',
+      text: 'HOME',
     },
   },
   {
@@ -29,12 +31,17 @@ const _nav = [
     component: CNavGroup,
     name: 'Admins',
     to: '/admins',
-    icon: <CIcon icon={cilUserX} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'List',
         to: '/admins/list',
+      },
+      {
+        component: CNavItem,
+        name: 'Create',
+        to: '/admins/create',
       },
     ],
   },
@@ -106,7 +113,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Maintenance',
     to: '/maintenance',
-    icon: <CIcon icon={cilClock} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilAlarm} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -119,6 +126,28 @@ const _nav = [
         to: '/maintenance/create',
       },
     ],
+  },
+  {
+    component: CNavTitle,
+    name: 'Settings',
+  },
+  {
+    component: CNavItem,
+    name: 'Profile',
+    to: '/profile',
+    icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+    },
+  },
+  {
+    component: CNavItem,
+    name: 'Logout',
+    to: '/logout',
+    icon: <CIcon icon={cilAccountLogout} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+    },
   },
 ]
 

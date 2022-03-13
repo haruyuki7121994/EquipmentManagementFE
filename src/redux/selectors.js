@@ -22,5 +22,5 @@ export const currentMaintainer = (state) => state.maintainer.currentMaintainer
 export const currentEquipment = (state) => state.equipment.currentEquipment
 export const exportData = (state) => state.equipment.exportData
 
-// maintainers
+// maintenance
 export const currentMaintenance = (state) => state.maintenance.currentMaintenance

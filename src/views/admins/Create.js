@@ -25,17 +25,14 @@ const Create = () => {
   const validator = MAINTAINER_VALIDATOR
   const [invalidEmail, setInvalidEmail] = useState({ invalid: false, msg: '' })
   const [invalidUsername, setInvalidUsername] = useState({ invalid: false, msg: '' })
-  const [invalidPhone, setInvalidPhone] = useState({ invalid: false, msg: '' })
   const [invalidPassword, setInvalidPassword] = useState({ invalid: false, msg: '' })
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
-  const [isActive, setIsActive] = useState('inactive')
   const navigate = useHistory()
   const dispatch = useDispatch()
-  const activeOpts = useSelector(activeOptions)
   const handleSubmit = (e) => {
     let validated = true
     if (email.length === 0) {
@@ -53,28 +50,21 @@ const Create = () => {
       validated = false
     } else setInvalidPassword({ invalid: false, msg: '' })
 
-    if (phone.length === 0) {
-      setInvalidPhone({ invalid: true, msg: validator.phone.required })
-      validated = false
-    } else setInvalidPhone({ invalid: false, msg: '' })
-
     if (!validated) return
 
     const data = {
       username: username,
       email: email,
       password: password,
-      phone: phone,
-      address: address,
-      active: isActive === 'active',
-      role: ['maintainer'],
+      active: true,
+      role: ['admin'],
     }
     UserService.create(data)
       .then((r) => {
         const data = r.data
         if (data.status === STATUS_CODE.SUCCESS) {
           dispatch(alertReducer.actions.set(AlertService.getPayload('Create Successful!')))
-          navigate.push('/maintainers/list')
+          navigate.push('/admins/list')
         }
       })
       .catch((res) => {
@@ -94,10 +84,6 @@ const Create = () => {
   const handleChange = (e) => {
     const type = e.currentTarget.id
     switch (type) {
-      case 'active': {
-        e.target.value === 'active' ? setIsActive('active') : setIsActive('inactive')
-        break
-      }
       case 'email': {
         setEmail(e.target.value)
         break
@@ -127,7 +113,7 @@ const Create = () => {
     <CCol xs={12}>
       <CCard className="mb-4">
         <CCardHeader>
-          <strong>Create new Maintainer</strong>
+          <strong>Create new Admin</strong>
         </CCardHeader>
         <CCardBody>
           <CForm className="row g-2">
@@ -182,44 +168,6 @@ const Create = () => {
                 <strong>{invalidPassword.msg}</strong>
               </CFormFeedback>
             </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="phone">
-                Phone Number <span style={{ color: 'red' }}>(*)</span>
-              </CFormLabel>
-              <CFormInput
-                invalid={invalidPhone.invalid}
-                type="text"
-                id="phone"
-                value={phone}
-                placeholder={'Enter your phone number...'}
-                onChange={handleChange}
-              />
-              <CFormFeedback invalid>
-                <strong>{invalidPhone.msg}</strong>
-              </CFormFeedback>
-            </div>
-            <div className="mb-3">
-              <CFormLabel htmlFor="address">Address</CFormLabel>
-              <CFormInput
-                type="text"
-                value={address}
-                id="address"
-                placeholder={'Enter your address...'}
-                onChange={handleChange}
-              />
-            </div>
-            <CCol md={6} className="mb-3">
-              <CFormLabel htmlFor="active">
-                Active <span style={{ color: 'red' }}>(*)</span>
-              </CFormLabel>
-              <CFormSelect
-                id={'active'}
-                aria-label="Default select example"
-                options={activeOpts}
-                value={isActive}
-                onChange={handleChange}
-              />
-            </CCol>
             <CCol xs={12}>
               <CButton type="button" onClick={handleSubmit}>
                 Submit

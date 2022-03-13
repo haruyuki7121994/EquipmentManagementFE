@@ -1,5 +1,6 @@
 import {
   CAvatar,
+  CBadge,
   CButton,
   CCard,
   CCardBody,
@@ -16,120 +17,99 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import React from 'react'
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
+import React, { useEffect, useState } from 'react'
+import avatar from 'src/assets/images/avatars/maintainer_avatar.jpg'
 import QRCode from 'qrcode.react'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import {
-  cibCcAmex,
-  cibCcApplePay,
-  cibCcMastercard,
-  cibCcPaypal,
-  cibCcStripe,
-  cibCcVisa,
-  cifBr,
-  cifEs,
-  cifFr,
-  cifIn,
-  cifPl,
-  cifUs,
-} from '@coreui/icons'
-import avatar6 from '../../assets/images/avatars/6.jpg'
+import { useDispatch, useSelector } from 'react-redux'
+import { currentMaintainer } from '../../redux/selectors'
+import CookieService from '../../services/CookieService'
+import { STATUS_CODE } from '../../api'
+import UserService from '../../services/UserService'
+import { maintainerReducer } from '../../redux/reducers/maintainerReducer'
+import MaintenanceService from '../../services/MaintenanceService'
+import CommentService from '../../services/CommentService'
+import { AppPagination } from '../../components/AppPagination'
+import { useHistory } from 'react-router-dom'
 
 const Detail = () => {
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'SCALE110001',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'SCALE110002',
-        new: false,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'SCALE110003', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'SCALE110004', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'SCALE110005',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'SCALE110006',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'SCALE110007', icon: cibCcAmex },
-      activity: 'Last week',
-    },
-  ]
+  const dispatch = useDispatch()
+  const maintainer = useSelector(currentMaintainer)
+
+  const [pageMaintenance, setPageMaintenance] = useState(0)
+  const [sizeMaintenance, setSizeMaintenance] = useState(5)
+  const [metadataMaintenance, setMetadataMaintenance] = useState({})
+  const [maintenances, setMaintenances] = useState([])
+  const sttMapping = MaintenanceService.sttMapping
+  const typeMapping = ['Every Week', 'Every Month', 'Every Quarter', 'Every Year']
+
+  const [pageComment, setPageComment] = useState(0)
+  const [sizeComment, setSizeComment] = useState(5)
+  const [metadataComment, setMetadataComment] = useState({})
+  const [comments, setComments] = useState([])
+
+  const navigate = useHistory()
+
+  useEffect(() => {
+    if (Object.keys(maintainer).length === 0) {
+      const id = CookieService.get('maintainer_id')
+      UserService.get(id).then((res) => {
+        const data = res.data
+        if (data.status === STATUS_CODE.SUCCESS) {
+          dispatch(
+            maintainerReducer.actions.find({
+              data: data.data,
+            }),
+          )
+        }
+      })
+    }
+
+    if (Object.keys(maintainer).length > 0 && (pageMaintenance || sizeMaintenance)) {
+      const maintenanceData = {
+        params: {
+          page: pageMaintenance,
+          size: sizeMaintenance,
+          orderBy: 'dateMaintenance-asc',
+          username: maintainer.username,
+        },
+      }
+      MaintenanceService.getAll(maintenanceData).then((res) => {
+        const data = res.data
+        if (data.status === STATUS_CODE.SUCCESS) {
+          setMaintenances(data.data.maintenances)
+          setMetadataMaintenance(data.metadata)
+        }
+      })
+    }
+
+    if (Object.keys(maintainer).length > 0 && (pageComment || sizeComment)) {
+      const commentData = {
+        params: {
+          page: pageComment,
+          size: sizeComment,
+          orderBy: 'id-asc',
+          username: maintainer.username,
+        },
+      }
+      CommentService.getAll(commentData).then((res) => {
+        const data = res.data
+        if (data.status === STATUS_CODE.SUCCESS) {
+          setComments(data.data.comments)
+          setMetadataComment(data.metadata)
+        }
+      })
+    }
+  }, [dispatch, maintainer, pageMaintenance, sizeMaintenance, pageComment, sizeComment])
+
+  const handleClickUpdateBtn = (e) => {
+    navigate.push('/maintainers/edit')
+  }
+
+  const handleClickEquipment = (e) => {
+    CookieService.save('equipment_id', e.currentTarget.id)
+    navigate.push('/equipments/details')
+  }
+
   return (
     <CCol xs={12}>
       <CCard className="mb-4">
@@ -143,18 +123,23 @@ const Detail = () => {
               <CRow>
                 <CCol md={6}>
                   <CTableHeaderCell scope="row">
-                    <CAvatar size="xl" src={avatar1} />
+                    <CAvatar className={'maintainer-avatar'} size="xl" src={avatar} />
                   </CTableHeaderCell>
-                  <CCardTitle>Admin1</CCardTitle>
-                  <CButton href="#">Update</CButton>
+                  <CCardTitle>{maintainer.username}</CCardTitle>
+                  <CButton onClick={handleClickUpdateBtn}>Update</CButton>
                 </CCol>
                 <CCol md={6}>
                   <h4>Information</h4>
                   <br />
-                  <CCardText>Email: admin1@gmail.com</CCardText>
-                  <CCardText>Phone number: 0338330044</CCardText>
-                  <CCardText>Address: 30 CMT8, Tan Binh District, HCM City</CCardText>
-                  <CCardText>Active: Yes</CCardText>
+                  <CCardText>Email: {maintainer.email}</CCardText>
+                  <CCardText>Phone number: {maintainer.phone}</CCardText>
+                  <CCardText>Address: {maintainer.address}</CCardText>
+                  <CCardText>
+                    Status:{' '}
+                    <CBadge color={maintainer._active ? 'success' : 'danger'}>
+                      {maintainer._active ? 'Active' : 'Inactive'}
+                    </CBadge>
+                  </CCardText>
                 </CCol>
               </CRow>
             </CCardBody>
@@ -163,7 +148,7 @@ const Detail = () => {
           <CCard>
             <CCardHeader>Comments</CCardHeader>
             <CCardBody>
-              <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTable align="middle" className="mb-3 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>QrCode</CTableHeaderCell>
@@ -173,31 +158,38 @@ const Detail = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {tableExample.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index}>
-                      <CTableDataCell>
-                        <QRCode
-                          id="qrcode"
-                          value={item.user.name}
-                          size={50}
-                          level={'H'}
-                          includeMargin={true}
-                        />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <CLink href="/">Body Scale</CLink>
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        It is a long established fact that a reader ...
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="small text-medium-emphasis">Last comment</div>
-                        <strong>{item.activity}</strong>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
+                  {comments.length > 0
+                    ? comments.map((item, index) => (
+                        <CTableRow v-for="item in tableItems" key={index}>
+                          <CTableDataCell>
+                            <QRCode
+                              id="qrcode"
+                              value={item.equipment !== undefined ? item.equipment.qrcode : 'abc'}
+                              size={50}
+                              level={'H'}
+                              includeMargin={true}
+                            />
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            <CLink id={item.equipment.id} onClick={handleClickEquipment}>
+                              {item.equipment.name}
+                            </CLink>
+                          </CTableDataCell>
+                          <CTableDataCell>{item.description}</CTableDataCell>
+                          <CTableDataCell>
+                            <div className="small text-medium-emphasis">Last comment</div>
+                            <strong>{item.createdAt}</strong>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))
+                    : null}
                 </CTableBody>
               </CTable>
+              <AppPagination
+                metadata={metadataComment}
+                onSizeChange={(e) => setPageComment(parseInt(e.currentTarget.value))}
+                onPageChange={(e) => setSizeComment(parseInt(e.currentTarget.id))}
+              />
             </CCardBody>
           </CCard>
           <br />
@@ -215,43 +207,40 @@ const Detail = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  <CTableRow className={'middle-vertical'}>
-                    <CTableDataCell>5</CTableDataCell>
-                    <CTableDataCell>2022/03/25</CTableDataCell>
-                    <CTableDataCell>3</CTableDataCell>
-                    <CTableDataCell>Pending</CTableDataCell>
-                    <CTableDataCell></CTableDataCell>
-                  </CTableRow>
-                  <CTableRow className={'middle-vertical'}>
-                    <CTableDataCell>4</CTableDataCell>
-                    <CTableDataCell>2022/02/22</CTableDataCell>
-                    <CTableDataCell>20</CTableDataCell>
-                    <CTableDataCell>Pending</CTableDataCell>
-                    <CTableDataCell>Every year</CTableDataCell>
-                  </CTableRow>
-                  <CTableRow className={'middle-vertical'}>
-                    <CTableDataCell>3</CTableDataCell>
-                    <CTableDataCell>2022/02/20</CTableDataCell>
-                    <CTableDataCell>15</CTableDataCell>
-                    <CTableDataCell>Pending</CTableDataCell>
-                    <CTableDataCell></CTableDataCell>
-                  </CTableRow>
-                  <CTableRow className={'middle-vertical'}>
-                    <CTableDataCell>2</CTableDataCell>
-                    <CTableDataCell>2022/02/18</CTableDataCell>
-                    <CTableDataCell>3</CTableDataCell>
-                    <CTableDataCell>Notified</CTableDataCell>
-                    <CTableDataCell>Every month</CTableDataCell>
-                  </CTableRow>
-                  <CTableRow className={'middle-vertical'}>
-                    <CTableDataCell>1</CTableDataCell>
-                    <CTableDataCell>2021/02/22</CTableDataCell>
-                    <CTableDataCell>5</CTableDataCell>
-                    <CTableDataCell>Completed</CTableDataCell>
-                    <CTableDataCell></CTableDataCell>
-                  </CTableRow>
+                  {maintenances.length > 0
+                    ? maintenances.map((maintenance) => (
+                        <CTableRow key={maintenance.id} className={'middle-vertical'}>
+                          <CTableDataCell>{maintenance.id}</CTableDataCell>
+                          <CTableDataCell>{maintenance.dateMaintenance}</CTableDataCell>
+                          <CTableDataCell>{maintenance.equipments.length}</CTableDataCell>
+                          <CTableDataCell>
+                            <CBadge
+                              color={
+                                maintenance.status === 0
+                                  ? 'info'
+                                  : maintenance.status === 1
+                                  ? 'success'
+                                  : 'danger'
+                              }
+                            >
+                              {sttMapping[maintenance.status]}
+                            </CBadge>
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {maintenance.repeatable
+                              ? typeMapping[maintenance.repeatedType]
+                              : 'None'}
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))
+                    : null}
                 </CTableBody>
               </CTable>
+              <AppPagination
+                metadata={metadataMaintenance}
+                onSizeChange={(e) => setSizeMaintenance(parseInt(e.currentTarget.value))}
+                onPageChange={(e) => setPageMaintenance(parseInt(e.currentTarget.id))}
+              />
             </CCardBody>
           </CCard>
         </CCardBody>

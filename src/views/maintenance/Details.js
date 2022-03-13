@@ -25,8 +25,6 @@ import { maintenanceReducer } from '../../redux/reducers/maintenanceReducer'
 import CookieService from '../../services/CookieService'
 import CIcon from '@coreui/icons-react'
 import { cilTrash } from '@coreui/icons'
-import { alertReducer } from '../../redux/reducers/alertReducer'
-import AlertService from '../../services/AlertService'
 
 const Detail = () => {
   const dispatch = useDispatch()

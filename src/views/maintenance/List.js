@@ -27,6 +27,9 @@ import store from '../../store'
 import { AppPagination } from '../../components/AppPagination'
 import { AppAlert } from '../../components/AppAlert'
 import CookieService from '../../services/CookieService'
+import { AppPopupWarning } from '../../components/AppPopupWarning'
+import { alertReducer } from '../../redux/reducers/alertReducer'
+import AlertService from '../../services/AlertService'
 
 const List = () => {
   const [maintenances, setMaintenances] = useState([])
@@ -35,6 +38,7 @@ const List = () => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [orderBy, setOrderBy] = useState('id-desc')
+  const [count, setCount] = useState(0)
   const [popup, setPopup] = useState({ show: false, id: null })
   const dispatch = useDispatch()
   const navigate = useHistory()
@@ -62,7 +66,6 @@ const List = () => {
     }
     MaintenanceService.getAll(data).then((res) => {
       const data = res.data
-      console.log(data)
       if (data.status === STATUS_CODE.SUCCESS) {
         dispatch(
           maintenanceReducer.actions.getList({
@@ -73,7 +76,7 @@ const List = () => {
         setMaintenances(res.data.data.maintenances)
       }
     })
-  }, [dispatch, orderBy, page, size, startDate, endDate])
+  }, [count, dispatch, orderBy, page, size, startDate, endDate])
 
   const handleChange = (e) => {
     setOrderBy(e.currentTarget.value)
@@ -92,6 +95,11 @@ const List = () => {
   const handleClickNotificationBtn = (e) => {
     saveId(e.currentTarget.id)
     findMaintenance(e.currentTarget.id, '/maintenance/notify')
+  }
+
+  const handleClickEditBtn = (e) => {
+    saveId(e.currentTarget.id)
+    findMaintenance(e.currentTarget.id, '/maintenance/edit')
   }
 
   const findMaintenance = (id, redirectUrl) => {
@@ -124,9 +132,41 @@ const List = () => {
     }
   }
 
+  const handleClickRemoveBtn = (e) => {
+    setPopup({ show: true, id: e.currentTarget.id })
+  }
+
+  const handleDeleteTrue = (e) => {
+    if (popup.show && popup.id) {
+      MaintenanceService.remove(popup.id)
+        .then((res) => {
+          const data = res.data
+          if (data.status === STATUS_CODE.SUCCESS) {
+            setCount(count + 1)
+            dispatch(alertReducer.actions.set(AlertService.getPayload('Delete Successful!')))
+          }
+        })
+        .catch((reason) => {
+          if (reason.response.status === STATUS_CODE.BAD_REQUEST) {
+            dispatch(alertReducer.actions.set(AlertService.getPayload('Delete Failed!')))
+          }
+        })
+      handleDeleteFalse()
+    }
+  }
+
+  const handleDeleteFalse = () => {
+    setPopup({ show: false, id: null })
+  }
+
   return (
     // Table
     <CCol xs={12}>
+      <AppPopupWarning
+        visible={popup.show}
+        handleDeleteTrue={handleDeleteTrue}
+        handleDeleteFalse={handleDeleteFalse}
+      />
       <CCard className="mb-4">
         <CCardHeader>
           <strong>List Maintenance</strong>
@@ -208,7 +248,12 @@ const List = () => {
                     >
                       <CIcon icon={cilDescription} />
                     </CButton>
-                    <CButton className={'icon-light m-1'} size={'sm'}>
+                    <CButton
+                      id={maintenance.id}
+                      onClick={handleClickEditBtn}
+                      className={'icon-light m-1'}
+                      size={'sm'}
+                    >
                       <CIcon icon={cilPencil} />
                     </CButton>
                     <CButton
@@ -229,7 +274,13 @@ const List = () => {
                     >
                       <CIcon icon={cilBellExclamation} />
                     </CButton>
-                    <CButton color={'danger'} className={'icon-light m-1'} size={'sm'}>
+                    <CButton
+                      id={maintenance.id}
+                      onClick={handleClickRemoveBtn}
+                      color={'danger'}
+                      className={'icon-light m-1'}
+                      size={'sm'}
+                    >
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>
@@ -238,7 +289,7 @@ const List = () => {
             </CTableBody>
           </CTable>
           <AppPagination
-            metadata={store.getState().category.metadata}
+            metadata={store.getState().maintenance.metadata}
             onSizeChange={(e) => setSize(parseInt(e.currentTarget.value))}
             onPageChange={(e) => setPage(parseInt(e.currentTarget.id))}
           />

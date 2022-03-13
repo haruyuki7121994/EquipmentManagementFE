@@ -52,6 +52,8 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 // Admin
 const ListAdmins = React.lazy(() => import('./views/admins/List'))
+const CreateAdmins = React.lazy(() => import('./views/admins/Create'))
+const Profile = React.lazy(() => import('./views/pages/profile/Profile'))
 
 // Maintainer
 const ListMaintainers = React.lazy(() => import('./views/maintainers/List'))
@@ -77,12 +79,15 @@ const A4Page = React.lazy(() => import('./views/equipments/A4Page'))
 const ListMaintenance = React.lazy(() => import('./views/maintenance/List'))
 const CreateMaintenance = React.lazy(() => import('./views/maintenance/Create'))
 const AddEquipment = React.lazy(() => import('./views/maintenance/AddEquipment'))
+const EditMaintenance = React.lazy(() => import('./views/maintenance/Update'))
 const Notify = React.lazy(() => import('./views/maintenance/Notify'))
 const DetailMaintenance = React.lazy(() => import('./views/maintenance/Details'))
 
 const routes = [
+  { path: '/profile', name: 'Profile', component: Profile },
   { path: '/admins', name: 'Admins', component: Cards, exact: true },
   { path: '/admins/list', name: 'List', component: ListAdmins },
+  { path: '/admins/create', name: 'Create', component: CreateAdmins },
   { path: '/categories', name: 'Categories', component: Cards, exact: true },
   { path: '/categories/list', name: 'List', component: ListCategories },
   { path: '/categories/create', name: 'Create', component: CreateCategories },
@@ -100,12 +105,13 @@ const routes = [
   { path: '/equipments/edit', name: 'Edit', component: UpdateEquipments },
   { path: '/equipments/export', name: 'Export', component: ExportQrcode },
   { path: '/equipments/a4', name: 'Edit', component: A4Page },
-  { path: '/maintenance', name: 'Maintainers', component: Cards, exact: true },
+  { path: '/maintenance', name: 'Maintenance', component: Cards, exact: true },
   { path: '/maintenance/list', name: 'List', component: ListMaintenance },
   { path: '/maintenance/create', name: 'Create', component: CreateMaintenance },
   { path: '/maintenance/add', name: 'Add', component: AddEquipment },
   { path: '/maintenance/notify', name: 'Notify', component: Notify },
   { path: '/maintenance/detail', name: 'Detail', component: DetailMaintenance },
+  { path: '/maintenance/edit', name: 'Edit', component: EditMaintenance },
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

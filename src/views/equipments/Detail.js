@@ -1,5 +1,4 @@
 import {
-  CAvatar,
   CButton,
   CCard,
   CCardBody,
@@ -11,10 +10,10 @@ import {
   CCarouselItem,
   CCol,
   CImage,
+  CLink,
   CRow,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
-import avatar1 from 'src/assets/images/avatars/1.jpg'
 import QRCode from 'qrcode.react'
 import { useDispatch, useSelector } from 'react-redux'
 import { currentEquipment } from '../../redux/selectors'
@@ -54,6 +53,12 @@ const Detail = () => {
   const handleClickUpdateBtn = (e) => {
     navigate.push('/equipments/edit')
   }
+
+  const handleClickUsername = (e) => {
+    CookieService.save('maintainer_id', e.currentTarget.id)
+    navigate.push('/maintainers/detail')
+    console.log(e.currentTarget.id)
+  }
   return (
     <CCol xs={12}>
       <CCard className="mb-4">
@@ -64,18 +69,22 @@ const Detail = () => {
           <CRow>
             <CCol md={3} />
             <CCol md={6}>
-              <CCarousel controls indicators dark>
-                {gallery.map((image) => (
-                  <CCarouselItem key={image.id}>
-                    <CImage
-                      style={{ height: '450px', objectFit: 'contain' }}
-                      className="d-block image-center"
-                      src={image.path}
-                      alt="slide 1"
-                    />
-                  </CCarouselItem>
-                ))}
-              </CCarousel>
+              {gallery.length > 0 ? (
+                <>
+                  <CCarousel controls indicators dark>
+                    {gallery.map((image) => (
+                      <CCarouselItem key={image.id}>
+                        <CImage
+                          style={{ height: '450px', objectFit: 'contain' }}
+                          className="d-block image-center"
+                          src={image.path}
+                          alt="slide 1"
+                        />
+                      </CCarouselItem>
+                    ))}
+                  </CCarousel>
+                </>
+              ) : null}
             </CCol>
             <CCol md={3} />
           </CRow>
@@ -132,18 +141,22 @@ const Detail = () => {
           <CCard>
             <CCardHeader>Comments</CCardHeader>
             <CCardBody>
-              {equipment.comments !== undefined && equipment.comments !== null ? (
-                <CCard className="text-center">
-                  <CCardBody>
-                    <CAvatar size="md" src={avatar1} />
-                    <CCardText>
-                      <strong>Loan Pham</strong> <p>2022/29/02 20:00:00</p>
-                    </CCardText>
-                    <CCardText>
-                      With supporting text below as a natural lead-in to additional content.
-                    </CCardText>
-                  </CCardBody>
-                </CCard>
+              {equipment.comments !== undefined &&
+              equipment.comments !== null &&
+              equipment.comments.length > 0 ? (
+                equipment.comments.map((item) => (
+                  <CCard key={item.id} className="text-center">
+                    <CCardBody>
+                      <CCardText>
+                        <CLink id={item.user.id} onClick={handleClickUsername}>
+                          {item.user.username}
+                        </CLink>{' '}
+                        <p>{item.createdAt}</p>
+                      </CCardText>
+                      <CCardText dangerouslySetInnerHTML={{ __html: item.description }} />
+                    </CCardBody>
+                  </CCard>
+                ))
               ) : (
                 <p className="text-center">No comments</p>
               )}

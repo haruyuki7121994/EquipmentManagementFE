@@ -14,6 +14,11 @@ import {
   CFormTextarea,
   CInputGroup,
   CInputGroupText,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
   CRow,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
@@ -40,6 +45,8 @@ const BulkCreate = () => {
   const [invalidQuantity, setInvalidQuantity] = useState({ invalid: false, msg: '' })
   const [invalidQrcodeList, setInvalidQrcodeList] = useState({ invalid: false, msg: '' })
   const [qrcodeList, setQrcodeList] = useState([])
+  const [validQrcodeList, setValidQrcodeList] = useState([])
+  const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [location, setLocation] = useState('')
@@ -146,6 +153,14 @@ const BulkCreate = () => {
     setQrcodeList(listQrcode)
   }
 
+  const handleClickCheckBtn = (e) => {
+    const data = { qrcodeList: qrcodeList }
+    EquipmentService.checkListQrcode(data).then((res) => {
+      setValidQrcodeList(res.data.data)
+      console.log(res)
+    })
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     let validated = true
@@ -176,7 +191,7 @@ const BulkCreate = () => {
     } else setInvalidQuantity({ invalid: false, msg: '' })
 
     if (type === 'manual') {
-      const validQrcode = qrcodeList.length
+      const validQrcode = validQrcodeList.length
       if (validQrcode < quantity) {
         setInvalidQrcodeList({
           invalid: true,
@@ -237,6 +252,24 @@ const BulkCreate = () => {
 
   return (
     <CCol xs={12}>
+      <CModal visible={visible} onClose={() => setVisible(false)}>
+        <CModalHeader onClose={() => setVisible(false)}>
+          <CModalTitle>List Valid Qrcode</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>
+            Total: {validQrcodeList.length}/{qrcodeList.length}
+          </p>
+          {validQrcodeList.map((qrcode) => (
+            <p key={qrcode}>{qrcode}</p>
+          ))}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setVisible(false)}>
+            Close
+          </CButton>
+        </CModalFooter>
+      </CModal>
       <CCard className="mb-4">
         <CCardHeader>
           <strong>Bulk create new Equipment</strong>
@@ -295,6 +328,12 @@ const BulkCreate = () => {
                 <CFormFeedback invalid>
                   <strong>{invalidQrcodeList.msg}</strong>
                 </CFormFeedback>
+                <CButton onClick={handleClickCheckBtn} className={'m-2'} hidden={!show}>
+                  Check
+                </CButton>
+                <CButton onClick={() => setVisible(!visible)} className={'m-2'} hidden={!show}>
+                  Valid Qrcode
+                </CButton>
               </CCol>
             </CRow>
             <CCol md={12} className="mb-3">

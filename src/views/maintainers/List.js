@@ -19,10 +19,9 @@ import {
   CTableRow,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilDescription, cilPencil, cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-
-import avatar1 from 'src/assets/images/avatars/1.jpg'
+import avatar from 'src/assets/images/avatars/maintainer_avatar.jpg'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { STATUS_CODE } from '../../api'
@@ -53,6 +52,7 @@ const List = () => {
         size: size,
         role: 'maintainer',
         keyword: keyword,
+        orderBy: 'id-desc',
       },
     }
     UserService.getAll(data).then((res) => {
@@ -74,9 +74,18 @@ const List = () => {
     setPopup({ show: true, id: e.currentTarget.id })
   }
 
+  const handleClickDetailBtn = (e) => {
+    saveId(e.currentTarget.id)
+    findMaintainer(e.currentTarget.id, '/maintainers/detail')
+  }
+
   const handleClickUpdateBtn = (e) => {
     saveId(e.currentTarget.id)
-    UserService.get(e.currentTarget.id).then((res) => {
+    findMaintainer(e.currentTarget.id, '/maintainers/edit')
+  }
+
+  const findMaintainer = (id, redirectUrl) => {
+    UserService.get(id).then((res) => {
       const data = res.data
       if (data.status === STATUS_CODE.SUCCESS) {
         dispatch(
@@ -84,7 +93,7 @@ const List = () => {
             data: data.data,
           }),
         )
-        navigate.push('/maintainers/edit')
+        navigate.push(redirectUrl)
       }
     })
   }
@@ -139,18 +148,6 @@ const List = () => {
                 />
               </CInputGroup>
             </CCol>
-            <CCol xs={6} sm={6} />
-            <CCol xs={12} sm={2}>
-              <CFormSelect
-                aria-label="Default select example"
-                options={[
-                  'Filter',
-                  { label: 'One', value: '1' },
-                  { label: 'Two', value: '2' },
-                  { label: 'Three', value: '3', disabled: true },
-                ]}
-              />
-            </CCol>
           </CRow>
           <CTable hover>
             <CTableHead>
@@ -166,7 +163,7 @@ const List = () => {
               {maintainers.map((maintainer) => (
                 <CTableRow key={maintainer.id} className={'middle-vertical'}>
                   <CTableHeaderCell scope="row">
-                    <CAvatar size="md" src={avatar1} />
+                    <CAvatar size="md" src={avatar} />
                   </CTableHeaderCell>
                   <CTableDataCell>{maintainer.username}</CTableDataCell>
                   <CTableDataCell>{maintainer.email}</CTableDataCell>
@@ -176,6 +173,15 @@ const List = () => {
                     </CBadge>
                   </CTableDataCell>
                   <CTableDataCell>
+                    <CButton
+                      color={'info'}
+                      id={maintainer.id}
+                      onClick={handleClickDetailBtn}
+                      className={'icon-light m-1'}
+                      size={'sm'}
+                    >
+                      <CIcon icon={cilDescription} />
+                    </CButton>
                     <CButton
                       id={maintainer.id}
                       onClick={handleClickUpdateBtn}

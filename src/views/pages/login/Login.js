@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import {
   CButton,
@@ -17,12 +17,12 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { loginReducer } from '../../../redux/reducers/loginReducer'
-import axios from 'axios'
-import { API, HOST, STATUS_CODE } from '../../../api'
+import { authReducer } from '../../../redux/reducers/authReducer'
+import { STATUS_CODE } from '../../../api'
 import { AppAlert } from '../../../components/AppAlert'
 import { alertReducer } from '../../../redux/reducers/alertReducer'
 import AlertService from '../../../services/AlertService'
+import AuthService from '../../../services/AuthService'
 
 const Login = () => {
   const [invalidUsername, setInvalidUsername] = useState({ invalid: false, msg: '' })
@@ -31,6 +31,11 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
   const navigate = useHistory()
+  const auth = useSelector((state) => state.auth)
+
+  if (auth.isLogin && auth.data.token !== undefined && auth.data.token.length > 0) {
+    navigate.push('/dashboard')
+  }
 
   const handleClick = () => {
     let validated = true
@@ -46,28 +51,29 @@ const Login = () => {
 
     if (!validated) return
 
-    axios
-      .post(HOST + API.LOGIN, {
-        username: username,
-        password: password,
-      })
+    AuthService.login({ username: username, password: password })
       .then((r) => {
         const data = r.data
         if (data.status === STATUS_CODE.SUCCESS) {
-          document.cookie = `access_token=${data.data.token}`
-          dispatch(
-            loginReducer.actions.setAuth({
-              isLogin: true,
-              data: data.data,
-            }),
-          )
-          navigate.push('/dashboard')
+          const roles = data.data.roles
+          const active = data.data.active
+          if (active && roles.includes('ROLE_ADMIN')) {
+            document.cookie = `access_token=${data.data.token}`
+            dispatch(
+              authReducer.actions.setAuth({
+                isLogin: true,
+                data: data.data,
+              }),
+            )
+            navigate.push('/dashboard')
+          }
+        } else {
+          dispatch(alertReducer.actions.set(AlertService.getPayload('Login failed!')))
         }
       })
       .catch((res) => {
         if (res.response.status === STATUS_CODE.UNAUTHORIZED) {
           dispatch(alertReducer.actions.set(AlertService.getPayload('Login failed!')))
-          console.log('fail')
         }
       })
   }
@@ -127,7 +133,11 @@ const Login = () => {
                         </CButton>
                       </CCol>
                       <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
+                        <CButton
+                          onClick={() => navigate.push('/reset')}
+                          color="link"
+                          className="px-0"
+                        >
                           Forgot password?
                         </CButton>
                       </CCol>

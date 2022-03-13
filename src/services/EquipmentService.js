@@ -21,6 +21,9 @@ const edit = (id, data, config) => {
 const removeImage = (id) => {
   return http.delete(API.EQUIPMENT.DELETE_IMAGE.replace(':id', id))
 }
+const checkListQrcode = (data) => {
+  return http.post(API.EQUIPMENT.CHECK_QRCODE, data)
+}
 const EquipmentService = {
   getAll,
   get,
@@ -29,5 +32,6 @@ const EquipmentService = {
   create,
   removeImage,
   bulkCreate,
+  checkListQrcode,
 }
 export default EquipmentService

@@ -1,6 +1,15 @@
 const HOST = 'http://localhost:8080/api'
 const API = {
-  LOGIN: '/auth/login',
+  REPORT: {
+    LIST: '/report/all',
+  },
+  AUTH: {
+    LOGIN: '/auth/login',
+    PROFILE: '/auth/profile',
+    CHANGE_PASSWORD: '/auth/edit/password',
+    SEND_FORGOT_PASSWORD: '/auth/forgot-password/send',
+    VERIFY_FORGOT_PASSWORD: '/auth/forgot-password/verify',
+  },
   CATEGORY: {
     LIST: '/categories/all',
     CREATE: '/categories/create',
@@ -23,6 +32,7 @@ const API = {
     UPDATE: '/equipments/:id',
     DELETE: '/equipments/:id',
     DELETE_IMAGE: '/storage/:id',
+    CHECK_QRCODE: '/equipments/qrcode/check',
   },
   MAINTENANCE: {
     LIST: '/maintenances/all',
@@ -33,6 +43,9 @@ const API = {
     UPDATE: '/maintenances/:id',
     DELETE: '/maintenances/:id',
     NOTIFICATION: '/notifications/create',
+  },
+  COMMENT: {
+    LIST: '/comments/all',
   },
 }
 

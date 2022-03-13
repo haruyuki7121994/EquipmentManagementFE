@@ -2,8 +2,9 @@ import React from 'react'
 import { CRow, CCol, CWidgetStatsA } from '@coreui/react'
 import { getStyle } from '@coreui/utils'
 import { CChartBar, CChartLine } from '@coreui/react-chartjs'
+import PropTypes from 'prop-types'
 
-const WidgetsDropdown = () => {
+const WidgetsDropdown = ({ data }) => {
   return (
     <CRow>
       <CCol sm={6} lg={3}>
@@ -12,7 +13,7 @@ const WidgetsDropdown = () => {
           color="primary"
           value={
             <>
-              20 <span className="fs-6 fw-normal" />
+              {data.maintainers} <span className="fs-6 fw-normal" />
             </>
           }
           title="Maintainer"
@@ -81,7 +82,7 @@ const WidgetsDropdown = () => {
         <CWidgetStatsA
           className="mb-4"
           color="info"
-          value={<>10</>}
+          value={<>{data.categories}</>}
           title="Category"
           chart={
             <CChartLine
@@ -147,7 +148,7 @@ const WidgetsDropdown = () => {
         <CWidgetStatsA
           className="mb-4"
           color="warning"
-          value={<>100</>}
+          value={<>{data.equipments}</>}
           title="Equipment"
           chart={
             <CChartLine
@@ -200,7 +201,7 @@ const WidgetsDropdown = () => {
         <CWidgetStatsA
           className="mb-4"
           color="danger"
-          value={<>10</>}
+          value={<>{data.maintenances}</>}
           title="Maintenance Schedule"
           chart={
             <CChartBar
@@ -273,3 +274,6 @@ const WidgetsDropdown = () => {
 }
 
 export default WidgetsDropdown
+WidgetsDropdown.propTypes = {
+  data: PropTypes.object,
+}
