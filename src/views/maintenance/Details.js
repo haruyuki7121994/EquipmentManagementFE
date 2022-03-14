@@ -204,14 +204,16 @@ const Detail = () => {
                             : item.location}
                         </CTableDataCell>
                         <CTableDataCell>
-                          <CButton
-                            id={item.qrcode}
-                            onClick={handleCheckBtn}
-                            color={'danger'}
-                            style={{ color: 'white' }}
-                          >
-                            Remove
-                          </CButton>
+                          {!listQrcode.includes(item.qrcode) ? (
+                            <CButton
+                              id={item.qrcode}
+                              onClick={handleCheckBtn}
+                              color={'danger'}
+                              style={{ color: 'white' }}
+                            >
+                              Remove
+                            </CButton>
+                          ) : null}
                         </CTableDataCell>
                       </CTableRow>
                     ))}

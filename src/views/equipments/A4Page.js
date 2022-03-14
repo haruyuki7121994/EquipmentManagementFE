@@ -14,9 +14,9 @@ const A4Page = () => {
     l: 142,
   }
   const perPageMapping = {
-    s: 80,
-    m: 48,
-    l: 20,
+    s: 56,
+    m: 36,
+    l: 16,
   }
   const perLineMapping = {
     s: 8,
@@ -35,7 +35,7 @@ const A4Page = () => {
       subPage.push(subArray)
       subArray = []
     }
-    if (i + 1 === perPageMapping[size]) {
+    if ((i + 1) % perPageMapping[size] === 0) {
       qrcodeComponent.push(subPage)
       subPage = []
     }
@@ -63,33 +63,36 @@ const A4Page = () => {
     <div>
       {qrcodeComponent.map((page, index) => {
         return (
-          <CTable
-            key={index}
-            hover
-            id={`print${index}`}
-            style={{ width: '210px', background: '#ffffff' }}
-          >
-            <CTableBody>
-              {page.map((row, rowIdx) => {
-                return (
-                  <CTableRow key={rowIdx} className={'text-center'}>
-                    {row.map((item, itemIdx) => {
-                      return (
-                        <CTableHeaderCell key={itemIdx}>
-                          <QRCode
-                            value={item}
-                            size={pxMapping[size]}
-                            level={'H'}
-                            includeMargin={true}
-                          />
-                        </CTableHeaderCell>
-                      )
-                    })}
-                  </CTableRow>
-                )
-              })}
-            </CTableBody>
-          </CTable>
+          <>
+            <CTable
+              key={index}
+              hover
+              id={`print${index}`}
+              style={{ width: '640px', background: '#ffffff', tableLayout: 'fixed' }}
+            >
+              <CTableBody>
+                {page.map((row, rowIdx) => {
+                  return (
+                    <CTableRow key={rowIdx} className={'text-center'}>
+                      {row.map((item, itemIdx) => {
+                        return (
+                          <CTableHeaderCell key={itemIdx}>
+                            <QRCode
+                              value={item}
+                              size={pxMapping[size]}
+                              level={'H'}
+                              includeMargin={true}
+                            />
+                            <p style={{ fontSize: '50%' }}>{item}</p>
+                          </CTableHeaderCell>
+                        )
+                      })}
+                    </CTableRow>
+                  )
+                })}
+              </CTableBody>
+            </CTable>
+          </>
         )
       })}
       <CButton onClick={handleExport}>Export</CButton>

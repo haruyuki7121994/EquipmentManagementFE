@@ -208,9 +208,11 @@ const AddEquipment = () => {
                             : item.location}
                         </CTableDataCell>
                         <CTableDataCell>
-                          <CButton id={item.qrcode} onClick={handleCheckBtn}>
-                            Add
-                          </CButton>
+                          {!listQrcode.includes(item.qrcode) ? (
+                            <CButton id={item.qrcode} onClick={handleCheckBtn}>
+                              Add
+                            </CButton>
+                          ) : null}
                         </CTableDataCell>
                       </CTableRow>
                     ))}

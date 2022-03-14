@@ -37,9 +37,9 @@ const Export = () => {
     l: 142,
   }
   const perPageMapping = {
-    s: 80,
-    m: 48,
-    l: 20,
+    s: 56,
+    m: 36,
+    l: 16,
   }
   const [sizeQrcode, setSizeQrcode] = useState('s')
   const [keyword, setKeyword] = useState('')
@@ -190,7 +190,7 @@ const Export = () => {
                 type="radio"
                 name="flexRadioDefault"
                 id="s"
-                label="S (80 items per page)"
+                label="S (56 items per page)"
                 defaultChecked
                 onClick={handleSize}
               />
@@ -199,14 +199,14 @@ const Export = () => {
                 onClick={handleSize}
                 name="flexRadioDefault"
                 id="m"
-                label="M (48 items per page)"
+                label="M (36 items per page)"
               />
               <CFormCheck
                 type="radio"
                 onClick={handleSize}
                 name="flexRadioDefault"
                 id="l"
-                label="L (20 items per page)"
+                label="L (16 items per page)"
               />
               <QRCode id="qrcode-s" value={'abc'} size={px} level={'H'} includeMargin={true} />
             </CCol>
@@ -275,9 +275,11 @@ const Export = () => {
                           : item.location}
                       </CTableDataCell>
                       <CTableDataCell>
-                        <CButton id={item.qrcode} onClick={handleCheckBtn}>
-                          Add
-                        </CButton>
+                        {!listQrcode.includes(item.qrcode) ? (
+                          <CButton id={item.qrcode} onClick={handleCheckBtn}>
+                            Add
+                          </CButton>
+                        ) : null}
                       </CTableDataCell>
                     </CTableRow>
                   ))}

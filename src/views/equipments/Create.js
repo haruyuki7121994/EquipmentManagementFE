@@ -34,6 +34,7 @@ const Create = () => {
   const [invalidName, setInvalidName] = useState({ invalid: false, msg: '' })
   const [invalidActive, setInvalidActive] = useState({ invalid: false, msg: '' })
   const [invalidCategory, setInvalidCategory] = useState({ invalid: false, msg: '' })
+  const [invalidQrcode, setInvalidQrcode] = useState({ invalid: false, msg: '' })
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
   const [qrcode, setQrcode] = useState('')
@@ -115,16 +116,20 @@ const Create = () => {
   }
 
   const handleSubmit = (e) => {
-    if (name.length === 0 || status.length === 0 || category.length === 0) {
+    console.log(qrcode.length)
+    if (name.length === 0 || status.length === 0 || category.length === 0 || qrcode.length > 20) {
       if (category.length === 0) {
         setInvalidCategory({ invalid: true, msg: validator.category.required })
-      }
+      } else setInvalidCategory({ invalid: false, msg: '' })
       if (name.length === 0) {
         setInvalidName({ invalid: true, msg: validator.name.required })
-      }
+      } else setInvalidName({ invalid: false, msg: '' })
       if (status.length === 0) {
         setInvalidActive({ invalid: true, msg: validator.active.required })
-      }
+      } else setInvalidActive({ invalid: false, msg: '' })
+      if (qrcode.length > 20) {
+        setInvalidQrcode({ invalid: true, msg: validator.qrcode.max })
+      } else setInvalidQrcode({ invalid: false, msg: '' })
       return
     }
 
@@ -133,6 +138,7 @@ const Create = () => {
     }
     let formData = new FormData()
     formData.append('name', name)
+    formData.append('qrcode', qrcode)
     formData.append('weight', weight)
     formData.append('height', height)
     formData.append('width', width)
@@ -228,12 +234,16 @@ const Create = () => {
                 system !
               </CAlert>
               <CFormInput
+                invalid={invalidQrcode.invalid}
                 type="text"
                 id="qrcode"
                 placeholder={'Please input qrcode...'}
                 value={qrcode}
                 onChange={handleChange}
               />
+              <CFormFeedback invalid>
+                <strong>{invalidQrcode.msg}</strong>
+              </CFormFeedback>
             </CCol>
             <CCol md={12} className="mb-3">
               <CFormLabel htmlFor="location">Location</CFormLabel>

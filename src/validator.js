@@ -12,6 +12,9 @@ const EQUIPMENT_VALIDATOR = {
   name: {
     required: 'Name is required!',
   },
+  qrcode: {
+    max: 'Max length of qrcode is 20 character!',
+  },
   category: {
     required: 'Category is required!',
   },
