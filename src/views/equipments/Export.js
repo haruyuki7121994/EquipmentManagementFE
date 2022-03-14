@@ -22,24 +22,27 @@ import QRCode from 'qrcode.react'
 import React, { useEffect, useState } from 'react'
 import store from '../../store'
 import { AppPagination } from '../../components/AppPagination'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import EquipmentService from '../../services/EquipmentService'
 import { STATUS_CODE } from '../../api'
 import { equipmentReducer } from '../../redux/reducers/equipmentReducer'
 import CIcon from '@coreui/icons-react'
 import { cilTrash } from '@coreui/icons'
+import { exportData } from '../../redux/selectors'
 
 const Export = () => {
   const pxMapping = {
     s: 64,
     m: 90,
     l: 142,
+    xl: 250,
   }
   const perPageMapping = {
     s: 56,
     m: 36,
     l: 16,
+    xl: 6,
   }
   const [sizeQrcode, setSizeQrcode] = useState('s')
   const [keyword, setKeyword] = useState('')
@@ -49,9 +52,18 @@ const Export = () => {
   const [items, setItems] = useState([])
   const [page, setPage] = useState(0)
   const [size, setSize] = useState(5)
+  const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
   const navigate = useHistory()
+  const ed = useSelector(exportData)
   useEffect(() => {
+    if (ed.totalItems.length > 0 && loading) {
+      setListQrcode(ed.totalItems)
+      setSizeQrcode(ed.qrcodeSize)
+      setPageQrcode(ed.totalPages)
+      setPx(pxMapping[ed.qrcodeSize])
+      setLoading(false)
+    }
     const data = {
       params: {
         page: page,
@@ -193,6 +205,7 @@ const Export = () => {
                 label="S (56 items per page)"
                 defaultChecked
                 onClick={handleSize}
+                checked={sizeQrcode === 's'}
               />
               <CFormCheck
                 type="radio"
@@ -200,6 +213,7 @@ const Export = () => {
                 name="flexRadioDefault"
                 id="m"
                 label="M (36 items per page)"
+                checked={sizeQrcode === 'm'}
               />
               <CFormCheck
                 type="radio"
@@ -207,6 +221,15 @@ const Export = () => {
                 name="flexRadioDefault"
                 id="l"
                 label="L (16 items per page)"
+                checked={sizeQrcode === 'l'}
+              />
+              <CFormCheck
+                type="radio"
+                onClick={handleSize}
+                name="flexRadioDefault"
+                id="xl"
+                label="XL (6 items per page)"
+                checked={sizeQrcode === 'xl'}
               />
               <QRCode id="qrcode-s" value={'abc'} size={px} level={'H'} includeMargin={true} />
             </CCol>

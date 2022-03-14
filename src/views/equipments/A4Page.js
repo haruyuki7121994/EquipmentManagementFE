@@ -6,24 +6,29 @@ import html2canvas from 'html2canvas'
 import { useSelector } from 'react-redux'
 import { exportData } from '../../redux/selectors'
 import Promise from 'bluebird'
+import { useHistory } from 'react-router-dom'
 
 const A4Page = () => {
   const pxMapping = {
     s: 64,
     m: 90,
     l: 142,
+    xl: 250,
   }
   const perPageMapping = {
     s: 56,
     m: 36,
     l: 16,
+    xl: 6,
   }
   const perLineMapping = {
     s: 8,
     m: 6,
     l: 4,
+    xl: 2,
   }
   const data = useSelector(exportData)
+  const navigate = useHistory()
   const listQrcode = data.totalItems
   const size = data.qrcodeSize
   let qrcodeComponent = []
@@ -58,6 +63,9 @@ const A4Page = () => {
     }).then(() => {
       pdf.save('download.pdf')
     })
+  }
+  const handleBack = (e) => {
+    navigate.push('/equipments/export')
   }
   return (
     <div>
@@ -96,6 +104,7 @@ const A4Page = () => {
         )
       })}
       <CButton onClick={handleExport}>Export</CButton>
+      <CButton onClick={handleBack}>Back</CButton>
     </div>
   )
 }
