@@ -103,8 +103,12 @@ const A4Page = () => {
           </>
         )
       })}
-      <CButton onClick={handleExport}>Export</CButton>
-      <CButton onClick={handleBack}>Back</CButton>
+      <CButton className={'m-2'} onClick={handleExport}>
+        Export
+      </CButton>
+      <CButton className={'m-2'} onClick={handleBack}>
+        Back
+      </CButton>
     </div>
   )
 }

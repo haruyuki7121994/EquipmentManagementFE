@@ -153,7 +153,7 @@ const Update = () => {
     <CCol xs={12}>
       <CCard className="mb-4">
         <CCardHeader>
-          <strong>Create new Maintenance</strong>
+          <strong>Edit Maintenance</strong>
         </CCardHeader>
         <CCardBody>
           <CForm className="row g-2">

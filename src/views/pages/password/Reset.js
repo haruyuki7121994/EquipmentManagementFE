@@ -18,11 +18,16 @@ import { cilUser } from '@coreui/icons'
 import AuthService from '../../../services/AuthService'
 import CookieService from '../../../services/CookieService'
 import { useHistory } from 'react-router-dom'
+import { AppAlert } from '../../../components/AppAlert'
+import { alertReducer } from '../../../redux/reducers/alertReducer'
+import AlertService from '../../../services/AlertService'
+import { useDispatch } from 'react-redux'
 
 const Reset = () => {
   const [email, setEmail] = useState('')
   const [invalidEmail, setInvalidEmail] = useState({ invalid: false, msg: '' })
   const history = useHistory()
+  const dispatch = useDispatch()
 
   const handleSubmit = (e) => {
     let validated = true
@@ -46,6 +51,11 @@ const Reset = () => {
       .catch((res) => {
         const data = res.response
         console.log(data)
+        dispatch(
+          alertReducer.actions.set(
+            AlertService.getPayload('Failed! Email is not existed in system!'),
+          ),
+        )
       })
   }
   return (
@@ -59,6 +69,7 @@ const Reset = () => {
                   <CForm>
                     <h1>Reset Password</h1>
                     <p className="text-medium-emphasis">Send email for reset password</p>
+                    <AppAlert />
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />

@@ -155,7 +155,7 @@ const Update = () => {
               />
             </CCol>
             <CCol xs={12}>
-              <CButton type="submit" onClick={handleSubmit}>
+              <CButton type="button" onClick={handleSubmit}>
                 Submit
               </CButton>
             </CCol>

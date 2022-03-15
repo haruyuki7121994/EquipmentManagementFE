@@ -87,7 +87,7 @@ const Detail = () => {
         params: {
           page: pageComment,
           size: sizeComment,
-          orderBy: 'id-asc',
+          orderBy: 'createdAt-desc',
           username: maintainer.username,
         },
       }
@@ -171,7 +171,7 @@ const Detail = () => {
                             />
                           </CTableDataCell>
                           <CTableDataCell>
-                            <CLink id={item.equipment.id} onClick={handleClickEquipment}>
+                            <CLink id={item.equipment.qrcode} onClick={handleClickEquipment}>
                               {item.equipment.name}
                             </CLink>
                           </CTableDataCell>
