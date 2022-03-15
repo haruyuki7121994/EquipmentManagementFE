@@ -9,6 +9,9 @@ const profile = () => {
 const changePassword = (data) => {
   return http.post(API.AUTH.CHANGE_PASSWORD, data)
 }
+const changeEmail = (data) => {
+  return http.post(API.AUTH.CHANGE_EMAIL, data)
+}
 const sendForgotPassword = (data) => {
   return http.post(API.AUTH.SEND_FORGOT_PASSWORD, data)
 }
@@ -21,5 +24,6 @@ const AuthService = {
   changePassword,
   sendForgotPassword,
   verifyForgotPassword,
+  changeEmail,
 }
 export default AuthService

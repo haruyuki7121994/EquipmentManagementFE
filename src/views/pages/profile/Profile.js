@@ -1,6 +1,5 @@
 import { useDispatch } from 'react-redux'
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
 import AuthService from '../../../services/AuthService'
 import {
   CBadge,
@@ -28,8 +27,10 @@ const Profile = () => {
   const [admin, setAdmin] = useState({})
   const [newPassword, setNewPassword] = useState('')
   const [rePassword, setRePassword] = useState('')
+  const [newEmail, setNewEmail] = useState('')
   const [invalidNewPassword, setInvalidNewPassword] = useState({ invalid: false, msg: '' })
   const [invalidRePassword, setInvalidRePassword] = useState({ invalid: false, msg: '' })
+  const [invalidEmail, setInvalidEmail] = useState({ invalid: false, msg: '' })
 
   useEffect(() => {
     AuthService.profile().then((res) => {
@@ -76,6 +77,36 @@ const Profile = () => {
     })
   }
 
+  const handleChangeEmail = (e) => {
+    let validated = true
+    if (newEmail.length === 0) {
+      setInvalidEmail({ invalid: true, msg: 'New Email required!' })
+      validated = false
+    } else setInvalidEmail({ invalid: false, msg: '' })
+    if (!validated) return
+
+    const data = {
+      email: newEmail,
+    }
+
+    AuthService.changeEmail(data)
+      .then((res) => {
+        const data = res.data
+        if (data.status === STATUS_CODE.SUCCESS) {
+          console.log(data.message)
+          dispatch(alertReducer.actions.set(AlertService.getPayload(data.message)))
+          const newAdmin = { ...admin }
+          newAdmin.email = newEmail
+          setAdmin(newAdmin)
+          setNewEmail('')
+        }
+      })
+      .catch((res) => {
+        console.log(res.response)
+        dispatch(alertReducer.actions.set(AlertService.getPayload(res.response.data.message)))
+      })
+  }
+
   return (
     <CContainer>
       <CRow>
@@ -87,6 +118,7 @@ const Profile = () => {
             </CCardHeader>
             <CCardBody>
               <CRow>
+                <AppAlert />
                 <CCol md={12} className={'text-center'}>
                   <CCardText>
                     <strong>Status</strong>:{' '}
@@ -112,11 +144,48 @@ const Profile = () => {
         <CCol xs={6}>
           <CCard className="mb-4">
             <CCardHeader className={'text-center'}>
+              <strong>Change Email</strong>
+            </CCardHeader>
+            <CCardBody>
+              <CRow>
+                <CForm>
+                  <CCol md={12} className={'text-center mb-2'}>
+                    <CFormFloating>
+                      <CFormInput
+                        invalid={invalidEmail.invalid}
+                        type="email"
+                        value={newEmail}
+                        id="email"
+                        onChange={(e) => setNewEmail(e.currentTarget.value)}
+                        placeholder="Email"
+                      />
+                      <CFormLabel htmlFor="exampleFormControlTextarea1">New Email</CFormLabel>
+                      <CFormFeedback invalid>
+                        <strong>{invalidEmail.msg}</strong>
+                      </CFormFeedback>
+                    </CFormFloating>
+                  </CCol>
+                  <CCol className={'text-center'}>
+                    <CButton type={'button'} onClick={handleChangeEmail}>
+                      Submit
+                    </CButton>
+                  </CCol>
+                </CForm>
+              </CRow>
+            </CCardBody>
+          </CCard>
+        </CCol>
+        <CCol xs={3} />
+      </CRow>
+      <CRow>
+        <CCol xs={3} />
+        <CCol xs={6}>
+          <CCard className="mb-4">
+            <CCardHeader className={'text-center'}>
               <strong>Change Password</strong>
             </CCardHeader>
             <CCardBody>
               <CRow>
-                <AppAlert />
                 <CForm>
                   <CCol md={12} className={'text-center mb-2'}>
                     <CFormFloating>

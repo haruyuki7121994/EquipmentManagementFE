@@ -7,6 +7,7 @@ const API = {
     LOGIN: '/auth/login',
     PROFILE: '/auth/profile',
     CHANGE_PASSWORD: '/auth/edit/password',
+    CHANGE_EMAIL: '/auth/edit/email',
     SEND_FORGOT_PASSWORD: '/auth/forgot-password/send',
     VERIFY_FORGOT_PASSWORD: '/auth/forgot-password/verify',
   },
