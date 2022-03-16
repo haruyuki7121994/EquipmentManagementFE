@@ -6,6 +6,7 @@ import {
   cilAlarm,
   cilBalanceScale,
   cilContact,
+  cilGroup,
   cilLayers,
   cilSpeedometer,
   cilUser,
@@ -26,6 +27,12 @@ const _nav = [
   {
     component: CNavTitle,
     name: 'Admin',
+  },
+  {
+    component: CNavItem,
+    name: 'Guest',
+    to: '/users',
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,

@@ -107,7 +107,10 @@ const List = () => {
       UserService.remove(popup.id)
         .then((res) => {
           const data = res.data
-          if (data.status === STATUS_CODE.SUCCESS) setCount(count + 1)
+          if (data.status === STATUS_CODE.SUCCESS) {
+            setCount(count + 1)
+            dispatch(alertReducer.actions.set(AlertService.getPayload('Delete Successful!')))
+          }
         })
         .catch((reason) => {
           if (reason.response.status === STATUS_CODE.BAD_REQUEST) {

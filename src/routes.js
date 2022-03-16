@@ -84,8 +84,12 @@ const EditMaintenance = React.lazy(() => import('./views/maintenance/Update'))
 const Notify = React.lazy(() => import('./views/maintenance/Notify'))
 const DetailMaintenance = React.lazy(() => import('./views/maintenance/Details'))
 
+// User
+const Users = React.lazy(() => import('./views/users/List'))
+
 const routes = [
   { path: '/profile', name: 'Profile', component: Profile },
+  { path: '/users', name: 'Users', component: Users },
   { path: '/admins', name: 'Admins', component: Cards, exact: true },
   { path: '/admins/list', name: 'List', component: ListAdmins },
   { path: '/admins/create', name: 'Create', component: CreateAdmins },
